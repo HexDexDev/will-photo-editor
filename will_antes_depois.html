@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0d12" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Will • Antes & Depois</title>
+  <style>
+    :root{
+      --bg:#080b10; --panel:#10151d; --panel2:#151c26; --text:#f7f9fc;
+      --muted:#9aa6b6; --line:rgba(255,255,255,.09); --accent:#9dff68;
+      --accent2:#52d9ff; --danger:#ff6f7d; --shadow:0 24px 70px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:
+      radial-gradient(1000px 600px at 5% -10%,rgba(82,217,255,.13),transparent 60%),
+      radial-gradient(900px 650px at 100% 0%,rgba(157,255,104,.10),transparent 55%),
+      var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif}
+    body{padding:clamp(14px,3vw,34px);padding-top:max(14px,env(safe-area-inset-top));padding-bottom:max(18px,env(safe-area-inset-bottom))}
+    button,input{font:inherit}
+    button{touch-action:manipulation}
+    .app{width:min(1200px,100%);margin:auto}
+    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:20px}
+    .brand{display:flex;align-items:center;gap:13px}
+    .mark{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+      display:grid;place-items:center;color:#071009;font-weight:950;font-size:22px;box-shadow:0 10px 40px rgba(157,255,104,.16)}
+    h1{font-size:clamp(24px,4vw,39px);margin:0;letter-spacing:-.045em;line-height:1}
+    .sub{color:var(--muted);margin-top:7px;font-size:14px}
+    .pill{border:1px solid var(--line);background:rgba(255,255,255,.04);color:#dfe7f0;padding:9px 12px;border-radius:999px;font-size:12px;white-space:nowrap}
+    .workspace{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.75fr);gap:18px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.025));border:1px solid var(--line);
+      border-radius:26px;box-shadow:var(--shadow);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+    .preview-card{padding:12px}
+    #stage{position:relative;width:100%;aspect-ratio:16/10;border-radius:19px;overflow:hidden;background:#0d1219;display:grid;grid-template-columns:1fr 1fr;gap:2px}
+    .photoPane{position:relative;overflow:hidden;background:
+      linear-gradient(135deg,rgba(255,255,255,.025),rgba(255,255,255,.008))}
+    .photoPane:after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.035)}
+    .photoPane img{position:absolute;left:50%;top:50%;width:auto;height:auto;max-width:none;max-height:none;user-select:none;-webkit-user-drag:none;touch-action:none;cursor:grab;transform-origin:center}
+    .photoPane img:active{cursor:grabbing}
+    .empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;gap:8px;color:var(--muted);cursor:pointer}
+    .empty .plus{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;border:1px solid var(--line);background:rgba(255,255,255,.05);color:#fff;font-size:24px}
+    .empty strong{color:#e9eef5;font-size:14px}.empty small{font-size:12px;max-width:210px;line-height:1.35}
+    .badge{position:absolute;top:13px;left:13px;z-index:5;background:rgba(4,7,11,.72);border:1px solid rgba(255,255,255,.13);
+      padding:8px 10px;border-radius:999px;font-weight:800;font-size:11px;letter-spacing:.09em;text-transform:uppercase;backdrop-filter:blur(10px)}
+    .badge.right{left:auto;right:13px}
+    .overlayTitle{position:absolute;z-index:6;left:50%;top:17px;transform:translateX(-50%);max-width:62%;text-align:center;
+      padding:9px 14px;border-radius:999px;background:rgba(5,8,12,.66);border:1px solid rgba(255,255,255,.11);font-size:clamp(11px,2vw,15px);font-weight:800;backdrop-filter:blur(10px)}
+    .overlayNote{position:absolute;z-index:6;left:50%;bottom:15px;transform:translateX(-50%);max-width:82%;text-align:center;
+      padding:8px 12px;border-radius:12px;background:rgba(5,8,12,.66);border:1px solid rgba(255,255,255,.10);font-size:clamp(10px,1.5vw,13px);backdrop-filter:blur(10px)}
+    .hidden{display:none!important}
+    .minihelp{padding:11px 8px 3px;color:var(--muted);font-size:12px;text-align:center}
+    .controls{padding:18px;display:flex;flex-direction:column;gap:16px}
+    .section{display:flex;flex-direction:column;gap:10px}
+    .sectionTitle{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:850;letter-spacing:.09em;text-transform:uppercase;color:#b9c4d2}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .btn{appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.055);color:var(--text);min-height:44px;border-radius:14px;padding:10px 12px;
+      font-weight:750;cursor:pointer;transition:.16s ease;display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn:hover{background:rgba(255,255,255,.085);transform:translateY(-1px)}
+    .btn:active{transform:scale(.985)}
+    .btn.primary{border:0;background:linear-gradient(135deg,var(--accent),#c8ff78);color:#091108}
+    .btn.export{border:0;background:linear-gradient(135deg,#e7f7ff,var(--accent2));color:#071016}
+    .btn.danger{color:#ffc8ce}
+    .field{display:flex;flex-direction:column;gap:6px}.field label{font-size:12px;color:var(--muted)}
+    .field input[type=text]{width:100%;border:1px solid var(--line);background:#0b1017;color:#fff;border-radius:13px;padding:12px 13px;outline:none}
+    .field input[type=text]:focus{border-color:rgba(82,217,255,.55);box-shadow:0 0 0 3px rgba(82,217,255,.08)}
+    .rangeWrap{display:grid;grid-template-columns:48px 1fr 40px;gap:8px;align-items:center}
+    .rangeWrap span{font-size:12px;color:var(--muted)} .rangeWrap output{text-align:right;font-size:12px;color:#dbe4ef}
+    input[type=range]{accent-color:var(--accent);width:100%}
+    .toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);padding:11px 12px;border-radius:14px;background:rgba(255,255,255,.025)}
+    .toggle span{font-size:13px}.switch{width:46px;height:27px;background:#29313c;border-radius:999px;padding:3px;cursor:pointer;transition:.2s}
+    .switch i{display:block;width:21px;height:21px;background:white;border-radius:50%;transition:.2s}.switch.on{background:var(--accent)}.switch.on i{transform:translateX(19px)}
+    footer{text-align:center;color:#6f7b8b;font-size:12px;padding:20px 8px 2px}
+    footer strong{color:#aeb9c6}
+    input[type=file]{display:none}
+    .toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translate(-50%,20px);opacity:0;pointer-events:none;
+      background:#f4f7fb;color:#0b1119;padding:11px 14px;border-radius:999px;font-size:13px;font-weight:800;box-shadow:0 15px 50px rgba(0,0,0,.35);transition:.25s;z-index:50}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(max-width:780px){
+      body{padding-left:10px;padding-right:10px}.top{padding:5px 4px 0}.pill{display:none}.workspace{grid-template-columns:1fr}
+      #stage{aspect-ratio:4/5}.controls{padding:14px}.preview-card{padding:8px}.row{grid-template-columns:1fr 1fr}
+      .badge{top:9px;left:9px}.badge.right{right:9px}.overlayTitle{top:10px}
+    }
+    @media(max-width:420px){.row.stackSmall{grid-template-columns:1fr}.mark{width:43px;height:43px;border-radius:14px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="mark">W</div>
+      <div><h1>Will • Antes & Depois</h1><div class="sub">Comparador de evolução física</div></div>
+    </div>
+    <div class="pill">Privado • funciona localmente</div>
+  </header>
+
+  <main class="workspace">
+    <section class="card preview-card">
+      <div id="stage">
+        <div class="photoPane" id="pane0">
+          <div class="badge" id="badge0">Antes</div>
+          <img id="img0" class="hidden" alt="Foto antes">
+          <div class="empty" id="empty0"><div class="plus">＋</div><strong>Adicionar foto</strong><small>Toque, arraste um arquivo ou cole uma imagem</small></div>
+        </div>
+        <div class="photoPane" id="pane1">
+          <div class="badge right" id="badge1">Depois</div>
+          <img id="img1" class="hidden" alt="Foto depois">
+          <div class="empty" id="empty1"><div class="plus">＋</div><strong>Adicionar foto</strong><small>Toque, arraste um arquivo ou cole uma imagem</small></div>
+        </div>
+        <div id="overlayTitle" class="overlayTitle hidden"></div>
+        <div id="overlayNote" class="overlayNote hidden"></div>
+      </div>
+      <div class="minihelp">Arraste cada foto para reposicionar. Use o zoom para acertar o enquadramento.</div>
+    </section>
+
+    <aside class="card controls">
+      <div class="section">
+        <div class="sectionTitle"><span>Fotos</span><span>01 / 02</span></div>
+        <div class="row">
+          <button class="btn primary" data-pick="0">＋ Antes</button>
+          <button class="btn primary" data-pick="1">＋ Depois</button>
+        </div>
+        <div class="row">
+          <button class="btn" id="swapBtn">⇄ Trocar lados</button>
+          <button class="btn" id="fitBtn">⌖ Centralizar</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sectionTitle"><span>Enquadramento</span><span id="selectedText">Antes</span></div>
+        <div class="row">
+          <button class="btn selectBtn" data-select="0">Editar Antes</button>
+          <button class="btn selectBtn" data-select="1">Editar Depois</button>
+        </div>
+        <div class="rangeWrap"><span>Zoom</span><input id="zoom" type="range" min="1" max="3.5" step=".01" value="1"><output id="zoomOut">100%</output></div>
+      </div>
+
+      <div class="section">
+        <div class="sectionTitle"><span>Texto opcional</span></div>
+        <div class="field"><label for="titleText">Título</label><input id="titleText" type="text" maxlength="55" placeholder="Ex.: Evolução • 12 semanas"></div>
+        <div class="row">
+          <div class="field"><label for="beforeText">Legenda esquerda</label><input id="beforeText" type="text" maxlength="22" value="Antes"></div>
+          <div class="field"><label for="afterText">Legenda direita</label><input id="afterText" type="text" maxlength="22" value="Depois"></div>
+        </div>
+        <div class="field"><label for="noteText">Observação</label><input id="noteText" type="text" maxlength="80" placeholder="Ex.: -8 kg • + definição"></div>
+      </div>
+
+      <div class="section">
+        <div class="sectionTitle"><span>Preferências</span></div>
+        <div class="toggle"><span>Som nas interações</span><div class="switch on" id="soundSwitch" role="switch" aria-checked="true" tabindex="0"><i></i></div></div>
+      </div>
+
+      <div class="section">
+        <div class="row stackSmall">
+          <button class="btn export" id="exportBtn">↓ Salvar montagem</button>
+          <button class="btn danger" id="clearBtn">Limpar</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>Ferramenta exclusiva para <strong>Will</strong> • Desenvolvido por <strong>Henrique</strong></footer>
+</div>
+
+<input type="file" id="file0" accept="image/*">
+<input type="file" id="file1" accept="image/*">
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const stage = $('#stage');
+  const imgs = [$('#img0'), $('#img1')];
+  const empties = [$('#empty0'), $('#empty1')];
+  const panes = [$('#pane0'), $('#pane1')];
+  const files = [$('#file0'), $('#file1')];
+  const state = [
+    {src:null, x:0, y:0, zoom:1, baseScale:1},
+    {src:null, x:0, y:0, zoom:1, baseScale:1}
+  ];
+  let selected = 0, soundOn = true, drag = null;
+
+  function beep(type='tap'){
+    if(!soundOn) return;
+    try{
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if(!window._ac) window._ac = new AC();
+      const ac=window._ac, o=ac.createOscillator(), g=ac.createGain();
+      o.connect(g); g.connect(ac.destination);
+      const now=ac.currentTime;
+      const f = type==='success' ? 660 : type==='remove' ? 240 : 440;
+      o.frequency.setValueAtTime(f,now);
+      if(type==='success') o.frequency.exponentialRampToValueAtTime(920,now+.09);
+      g.gain.setValueAtTime(.0001,now); g.gain.exponentialRampToValueAtTime(.045,now+.012); g.gain.exponentialRampToValueAtTime(.0001,now+.12);
+      o.start(now);o.stop(now+.13);
+    }catch(e){}
+  }
+
+  function toast(msg){
+    const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._tm);t._tm=setTimeout(()=>t.classList.remove('show'),1700);
+  }
+
+  function select(i){
+    selected=i; $('#selectedText').textContent=i===0?'Antes':'Depois';
+    $('#zoom').value=state[i].zoom; $('#zoomOut').textContent=Math.round(state[i].zoom*100)+'%';
+    document.querySelectorAll('.selectBtn').forEach((b,j)=>b.style.borderColor=j===i?'rgba(157,255,104,.55)':'');
+  }
+
+  function computeBase(i){
+    const img=imgs[i], pane=panes[i];
+    if(!img.naturalWidth) return;
+    const pw=pane.clientWidth, ph=pane.clientHeight;
+    state[i].baseScale=Math.max(pw/img.naturalWidth, ph/img.naturalHeight);
+    render(i);
+  }
+
+  function render(i){
+    const s=state[i], img=imgs[i];
+    if(!s.src) return;
+    const sc=s.baseScale*s.zoom;
+    img.style.width=(img.naturalWidth*sc)+'px';
+    img.style.height=(img.naturalHeight*sc)+'px';
+    img.style.transform=`translate(calc(-50% + ${s.x}px), calc(-50% + ${s.y}px))`;
+  }
+
+  function loadFile(i,file){
+    if(!file || !file.type.startsWith('image/')) return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      state[i]={src:e.target.result,x:0,y:0,zoom:1,baseScale:1};
+      imgs[i].onload=()=>{imgs[i].classList.remove('hidden');empties[i].classList.add('hidden');computeBase(i);select(i);beep('success')};
+      imgs[i].src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  document.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{beep();files[+b.dataset.pick].click()});
+  empties.forEach((e,i)=>e.onclick=()=>{beep();files[i].click()});
+  files.forEach((f,i)=>f.onchange=()=>loadFile(i,f.files[0]));
+  document.querySelectorAll('.selectBtn').forEach(b=>b.onclick=()=>{beep();select(+b.dataset.select)});
+
+  $('#zoom').addEventListener('input',e=>{
+    state[selected].zoom=+e.target.value; $('#zoomOut').textContent=Math.round(+e.target.value*100)+'%'; render(selected);
+  });
+
+  function startDrag(i,e){
+    if(!state[i].src) return;
+    select(i); e.preventDefault();
+    const p=e.touches?e.touches[0]:e;
+    drag={i,sx:p.clientX,sy:p.clientY,ox:state[i].x,oy:state[i].y};
+  }
+  function moveDrag(e){
+    if(!drag) return;
+    const p=e.touches?e.touches[0]:e;
+    state[drag.i].x=drag.ox+(p.clientX-drag.sx);state[drag.i].y=drag.oy+(p.clientY-drag.sy);render(drag.i);
+  }
+  function endDrag(){if(drag){beep();drag=null}}
+  imgs.forEach((img,i)=>{
+    img.addEventListener('mousedown',e=>startDrag(i,e)); img.addEventListener('touchstart',e=>startDrag(i,e),{passive:false});
+  });
+  window.addEventListener('mousemove',moveDrag);window.addEventListener('mouseup',endDrag);
+  window.addEventListener('touchmove',moveDrag,{passive:false});window.addEventListener('touchend',endDrag);
+
+  panes.forEach((pane,i)=>{
+    ['dragenter','dragover'].forEach(ev=>pane.addEventListener(ev,e=>{e.preventDefault();pane.style.outline='2px solid var(--accent)'}));
+    ['dragleave','drop'].forEach(ev=>pane.addEventListener(ev,e=>{e.preventDefault();pane.style.outline=''}));
+    pane.addEventListener('drop',e=>loadFile(i,e.dataTransfer.files[0]));
+    pane.addEventListener('click',()=>select(i));
+  });
+
+  window.addEventListener('paste',e=>{
+    const items=[...(e.clipboardData?.items||[])];
+    const item=items.find(x=>x.type.startsWith('image/'));
+    if(item){loadFile(selected,item.getAsFile());toast(`Imagem colada em ${selected===0?'Antes':'Depois'}`)}
+  });
+
+  $('#fitBtn').onclick=()=>{
+    beep(); [0,1].forEach(i=>{state[i].x=0;state[i].y=0;state[i].zoom=1;computeBase(i)}); select(selected);toast('Fotos centralizadas');
+  };
+
+  $('#swapBtn').onclick=()=>{
+    beep();
+    const a={...state[0]}, b={...state[1]}; state[0]={...b};state[1]={...a};
+    [0,1].forEach(i=>{
+      if(state[i].src){imgs[i].onload=()=>{imgs[i].classList.remove('hidden');empties[i].classList.add('hidden');computeBase(i)};imgs[i].src=state[i].src}
+      else {imgs[i].src='';imgs[i].classList.add('hidden');empties[i].classList.remove('hidden')}
+    });
+    select(selected);toast('Fotos trocadas');
+  };
+
+  const syncText=()=>{
+    const t=$('#titleText').value.trim(), n=$('#noteText').value.trim();
+    $('#overlayTitle').textContent=t;$('#overlayTitle').classList.toggle('hidden',!t);
+    $('#overlayNote').textContent=n;$('#overlayNote').classList.toggle('hidden',!n);
+    $('#badge0').textContent=$('#beforeText').value.trim()||'Antes';
+    $('#badge1').textContent=$('#afterText').value.trim()||'Depois';
+  };
+  ['titleText','noteText','beforeText','afterText'].forEach(id=>$('#'+id).addEventListener('input',syncText));
+
+  $('#soundSwitch').onclick=()=>{
+    soundOn=!soundOn;$('#soundSwitch').classList.toggle('on',soundOn);$('#soundSwitch').setAttribute('aria-checked',soundOn);if(soundOn)beep('success')
+  };
+  $('#soundSwitch').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#soundSwitch').click()}};
+
+  $('#clearBtn').onclick=()=>{
+    beep('remove');
+    [0,1].forEach(i=>{state[i]={src:null,x:0,y:0,zoom:1,baseScale:1};imgs[i].src='';imgs[i].classList.add('hidden');empties[i].classList.remove('hidden')});
+    $('#titleText').value='';$('#noteText').value='';$('#beforeText').value='Antes';$('#afterText').value='Depois';syncText();select(0);toast('Montagem limpa');
+  };
+
+  function roundedRect(ctx,x,y,w,h,r){
+    const rr=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();
+  }
+  function drawCover(ctx,img,s,rect){
+    const base=Math.max(rect.w/img.naturalWidth,rect.h/img.naturalHeight);
+    const sc=base*s.zoom, w=img.naturalWidth*sc,h=img.naturalHeight*sc;
+    const rx=s.x*(rect.w/panes[0].clientWidth), ry=s.y*(rect.h/panes[0].clientHeight);
+    ctx.save();ctx.beginPath();ctx.rect(rect.x,rect.y,rect.w,rect.h);ctx.clip();
+    ctx.drawImage(img,rect.x+(rect.w-w)/2+rx,rect.y+(rect.h-h)/2+ry,w,h);ctx.restore();
+  }
+  function pill(ctx,text,cx,y,align='center'){
+    if(!text)return;
+    ctx.font='800 24px -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif';
+    const padX=18, h=46, tw=ctx.measureText(text).width,w=tw+padX*2;
+    let x=align==='left'?cx:align==='right'?cx-w:cx-w/2;
+    ctx.fillStyle='rgba(4,7,11,.72)';roundedRect(ctx,x,y,w,h,23);ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,.18)';ctx.stroke();
+    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,x+w/2,y+h/2+1);
+  }
+
+  $('#exportBtn').onclick=async()=>{
+    if(!state[0].src&&!state[1].src){beep('remove');toast('Adicione pelo menos uma foto');return}
+    beep('success');
+    const W=1600,H=1000, gap=4, half=(W-gap)/2;
+    const c=document.createElement('canvas');c.width=W;c.height=H;const ctx=c.getContext('2d');
+    ctx.fillStyle='#0d1219';ctx.fillRect(0,0,W,H);
+    [0,1].forEach(i=>{if(state[i].src)drawCover(ctx,imgs[i],state[i],{x:i?half+gap:0,y:0,w:half,h:H})});
+    ctx.fillStyle='rgba(255,255,255,.17)';ctx.fillRect(half,0,gap,H);
+    pill(ctx,$('#beforeText').value.trim()||'Antes',26,26,'left');
+    pill(ctx,$('#afterText').value.trim()||'Depois',W-26,26,'right');
+    const title=$('#titleText').value.trim();
+    if(title){
+      ctx.font='800 30px -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif';
+      const tw=ctx.measureText(title).width,w=Math.min(tw+42,W-120),x=(W-w)/2;
+      ctx.fillStyle='rgba(4,7,11,.72)';roundedRect(ctx,x,25,w,52,26);ctx.fill();ctx.strokeStyle='rgba(255,255,255,.15)';ctx.stroke();
+      ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(title,W/2,51);
+    }
+    const note=$('#noteText').value.trim();
+    if(note){
+      ctx.font='700 24px -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif';
+      const tw=ctx.measureText(note).width,w=Math.min(tw+38,W-140),x=(W-w)/2,y=H-78;
+      ctx.fillStyle='rgba(4,7,11,.72)';roundedRect(ctx,x,y,w,50,15);ctx.fill();ctx.strokeStyle='rgba(255,255,255,.14)';ctx.stroke();
+      ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(note,W/2,y+25);
+    }
+    c.toBlob(async blob=>{
+      const filename='will-antes-depois.png';
+      const file=new File([blob],filename,{type:'image/png'});
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file],title:'Will • Antes & Depois'});toast('Montagem pronta');return}catch(e){if(e.name==='AbortError')return}
+      }
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Montagem salva');
+    },'image/png',.95);
+  };
+
+  let resizeTm;
+  window.addEventListener('resize',()=>{clearTimeout(resizeTm);resizeTm=setTimeout(()=>[0,1].forEach(computeBase),120)});
+  select(0);syncText();
+})();
+</script>
+</body>
+</html>
